@@ -1,7 +1,7 @@
 import argparse
 import logging
 import os
-
+import cv2
 import numpy as np
 import torch
 import torch.nn.functional as F
@@ -47,7 +47,7 @@ def get_args():
     parser.add_argument('--scale', '-s', type=float, default=0.5,
                         help='Scale factor for the input images')
     parser.add_argument('--bilinear', action='store_true', default=False, help='Use bilinear upsampling')
-    parser.add_argument('--classes', '-c', type=int, default=2, help='Number of classes')
+    parser.add_argument('--classes', '-c', type=int, default=1, help='Number of classes')
     
     return parser.parse_args()
 
@@ -60,7 +60,10 @@ def get_output_filenames(args):
 
 
 def mask_to_image(mask: np.ndarray, mask_values):
-    if isinstance(mask_values[0], list):
+    mask*=255
+    print(mask.max().dtype, np.sum(mask>200))
+    cv2.imwrite('mask.png', mask)
+    if False : # isinstance(mask_values[0], list):
         out = np.zeros((mask.shape[-2], mask.shape[-1], len(mask_values[0])), dtype=np.uint8)
     elif mask_values == [0, 1]:
         out = np.zeros((mask.shape[-2], mask.shape[-1]), dtype=bool)
